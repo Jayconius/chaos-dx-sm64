@@ -400,6 +400,7 @@ C.register({
     end,
     label = function(entry)
         if entry.target == my_global() then return "you're a Boo! you barely steer" end
+        if entry.target < 0 then return "everyone's a Boo!" end
         return name_of_global(entry.target) .. " is a Boo"
     end,
     onBeforeMario = function(m)
@@ -512,7 +513,8 @@ C.register({
     id = "bird_attack", name = "Bird Attack", kind = "hinder", duration = 14, target = "random", group = "bird",
     weight = 0.7,
     onStart = function(entry)
-        if entry.target ~= my_global() then return end
+        -- one bird per victim: each victim's own game spawns theirs (target -1 = everyone)
+        if entry.target >= 0 and entry.target ~= my_global() then return end
         local m = gMarioStates[0]
         local a = math.random(0, 65535)
         spawn_non_sync_object(bhvChaosBird, E_MODEL_KLEPTO,

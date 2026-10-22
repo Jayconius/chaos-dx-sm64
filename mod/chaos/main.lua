@@ -263,11 +263,18 @@ local function log_effect(def, how, target, dur, bonus)
     mod_storage_save("logCount", tostring(logCount))
 end
 
+-- Host settings (saved): do "one random player" effects hit everyone instead?
+-- Default: Hinders (Boo Mode, Bird Attack, Brain Freeze, Surprise Shove) hit everyone; Helps stay one lucky player.
+targetedHindersAll = (mod_storage_load("hindersAll") ~= "false")
+targetedHelpsAll = (mod_storage_load("helpsAll") == "true")
+
 local function fire_effect(id, how)
     local def = C.effects[id]
     if def == nil then return end
     local target = -1
-    if def.target == "random" then
+    -- "one random player" effects can be set (per kind) to hit everyone instead
+    local everyone = (def.kind == "hinder" and targetedHindersAll) or (def.kind == "help" and targetedHelpsAll)
+    if def.target == "random" and not everyone then
         local players = active_players()
         if #players > 0 then
             local pick = players[math.random(#players)]
@@ -898,6 +905,14 @@ hook_mod_menu_slider("Boss spawns: 0 Each level, 1 Near host, 2 Biggest group", 
         gGlobalSyncTable.chaosBossSpawn = v
         mod_storage_save("bossSpawn", tostring(v))
     end))
+hook_mod_menu_checkbox("Targeted Hinders hit everyone (Boo, Bird, Freeze, Shove)", targetedHindersAll, host_only(function(v)
+    targetedHindersAll = v
+    mod_storage_save("hindersAll", tostring(v))
+end))
+hook_mod_menu_checkbox("Targeted Helps hit everyone (Heal, Caps, Shield, Rainbow)", targetedHelpsAll, host_only(function(v)
+    targetedHelpsAll = v
+    mod_storage_save("helpsAll", tostring(v))
+end))
 hook_mod_menu_checkbox("Keep chaos going during boss fights", gGlobalSyncTable.chaosDuringBoss, host_only(function(v)
     gGlobalSyncTable.chaosDuringBoss = v
     mod_storage_save("duringBoss", tostring(v))

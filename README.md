@@ -58,6 +58,8 @@ Pause the game, open the **mod menu**, and find **Chaos settings**:
 | **Twitch mode: lobby /vote counts too** | Lets players in the game vote alongside Twitch chat |
 | **Boss spawns** | 0 one per level, 1 near the host, 2 at the biggest group of players |
 | **Keep chaos going during boss fights** | Untick to pause votes and effects while a boss is out |
+| **Targeted Hinders hit everyone** | On: Boo Mode, Bird Attack, Brain Freeze and Surprise Shove hit the whole lobby. Off: one random player |
+| **Targeted Helps hit everyone** | On: Full Heal, Wing/Metal Cap, Shield Bubble and Rainbow Star go to everyone. Off: one lucky player |
 | **Effect tick boxes** | Untick any effect you don't want. Your choices are saved |
 
 ### Chat commands
