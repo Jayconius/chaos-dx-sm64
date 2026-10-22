@@ -1,0 +1,121 @@
+:root {
+  --bg: #12131a;
+  --panel: #1c1e29;
+  --panel-2: #262938;
+  --text: #f1f2f6;
+  --muted: #9aa0b4;
+  --help: #5fe08a;
+  --hinder: #ff6b6b;
+  --gold: #ffc83d;
+  --line: #333748;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+body.transparent { background: transparent; }
+
+h1, h2, h3 { margin: 0; font-weight: 700; }
+.muted { color: var(--muted); }
+.help { color: var(--help); }
+.hinder { color: var(--hinder); }
+
+/* ---------- vote panel (overlay, dock, app) ---------- */
+.vote { background: rgba(20, 21, 30, 0.88); border: 2px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+.vote-title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.vote-title h2 { font-size: 22px; color: var(--gold); letter-spacing: 0.5px; }
+.vote-title .how { font-size: 14px; color: var(--muted); }
+.timer { height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+.timer > div { height: 100%; background: var(--gold); transition: width 0.25s linear; }
+.row { position: relative; display: flex; align-items: center; gap: 10px; padding: 7px 10px; margin: 5px 0;
+       background: var(--panel-2); border-radius: 8px; overflow: hidden; }
+.row .fill { position: absolute; inset: 0 auto 0 0; opacity: 0.22; transition: width 0.3s ease; }
+.row.help .fill { background: var(--help); }
+.row.hinder .fill { background: var(--hinder); }
+.row .num { position: relative; font-weight: 800; width: 22px; text-align: center; font-size: 18px; }
+.row .name { position: relative; flex: 1; font-size: 17px; font-weight: 600; }
+.row .count { position: relative; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 17px; }
+.row .kind { position: relative; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+.row.leading { outline: 2px solid var(--gold); }
+
+.cooldown { background: rgba(20, 21, 30, 0.8); border-radius: 10px; padding: 8px 12px; font-size: 15px; }
+
+/* ---------- stats (dock, app) ---------- */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; }
+.card .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.card .value { font-size: 22px; font-weight: 800; margin-top: 2px; }
+.section { margin-top: 12px; }
+.section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; }
+.list { display: flex; flex-direction: column; gap: 4px; }
+.list .item { background: var(--panel); border-radius: 7px; padding: 6px 9px; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; background: var(--hinder); }
+.dot.on { background: var(--help); }
+
+/* =============================================== overlay styles (body.theme-*) =============================================== */
+.row .star { display: none; }
+
+/* --- Transparent: no boxes, outlined text, thin bars --- */
+.theme-transparent .vote { background: transparent; border: 0; padding: 4px 0; }
+.theme-transparent .vote, .theme-transparent .cooldown {
+  text-shadow: 0 0 3px #000, 0 0 3px #000, 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; }
+.theme-transparent .vote-title .how { color: #fff; }
+.theme-transparent .timer { background: rgba(0, 0, 0, 0.35); height: 4px; }
+.theme-transparent .row { background: transparent; padding: 3px 4px; margin: 2px 0; }
+.theme-transparent .row .fill { inset: auto auto 0 0; height: 4px; opacity: 0.9; border-radius: 2px; }
+.theme-transparent .row.leading { outline: 0; }
+.theme-transparent .row.leading .name { color: var(--gold); }
+.theme-transparent .cooldown { background: transparent; }
+
+/* --- Minimal: small and compact --- */
+.theme-minimal .vote { background: rgba(12, 12, 18, 0.62); border: 0; border-radius: 8px; padding: 8px 10px; width: 300px; }
+.theme-minimal .vote-title { margin-bottom: 4px; }
+.theme-minimal .vote-title .title { display: none; }
+.theme-minimal .vote-title .how { font-size: 12px; color: #d8dbe6; }
+.theme-minimal .timer { height: 2px; margin-bottom: 4px; }
+.theme-minimal .row { background: transparent; padding: 2px 4px; margin: 1px 0; border-radius: 4px; gap: 6px; }
+.theme-minimal .row .num { font-size: 13px; width: 14px; }
+.theme-minimal .row .name { font-size: 13px; font-weight: 600; }
+.theme-minimal .row .count { font-size: 13px; }
+.theme-minimal .row .kind { display: none; }
+.theme-minimal .row .fill { opacity: 0.3; }
+.theme-minimal .row.leading { outline: 0; background: rgba(255, 200, 61, 0.14); }
+.theme-minimal .cooldown { font-size: 12px; padding: 4px 8px; background: rgba(12, 12, 18, 0.55); width: auto; display: inline-block; }
+
+/* --- Mario 64: blue menu panel, multicolour bouncing title, gold coins, star on the leader --- */
+.theme-mario64 .vote {
+  background: linear-gradient(180deg, #1d4fd0 0%, #0f2f8f 100%); border: 4px solid #fff; border-radius: 18px;
+  box-shadow: 0 0 0 4px #10183a, 0 8px 18px rgba(0, 0, 0, 0.45); padding: 12px 14px; font-family: "Arial Black", "Segoe UI Black", sans-serif; }
+.theme-mario64 .vote-title h2 { font-size: 30px; letter-spacing: 1px; }
+.theme-mario64 .title .l { display: inline-block; -webkit-text-stroke: 2px #10183a; paint-order: stroke fill;
+  text-shadow: 3px 3px 0 #10183a; animation: m64bounce 1.2s ease-in-out infinite; }
+.theme-mario64 .title .gap { display: inline-block; width: 10px; }
+.theme-mario64 .title .l:nth-child(4n+1) { color: #ff3b30; }
+.theme-mario64 .title .l:nth-child(4n+2) { color: #ffd60a; }
+.theme-mario64 .title .l:nth-child(4n+3) { color: #34c759; }
+.theme-mario64 .title .l:nth-child(4n+4) { color: #5ac8fa; }
+.theme-mario64 .title .l:nth-child(2n) { animation-delay: 0.15s; }
+.theme-mario64 .title .l:nth-child(3n) { animation-delay: 0.3s; }
+@keyframes m64bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.theme-mario64 .vote-title .how { color: #fff; font-family: "Segoe UI", sans-serif; font-weight: 700; text-shadow: 2px 2px 0 #10183a; }
+.theme-mario64 .timer { height: 10px; border-radius: 5px; background: #10183a; border: 2px solid #fff; }
+.theme-mario64 .timer > div { background: linear-gradient(90deg, #ffd60a, #ff9500); }
+.theme-mario64 .row { background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 12px; padding: 6px 10px; }
+.theme-mario64 .row .fill { opacity: 0.45; }
+.theme-mario64 .row.help .fill { background: #34c759; }
+.theme-mario64 .row.hinder .fill { background: #ff3b30; }
+.theme-mario64 .row .num { width: 28px; height: 28px; line-height: 24px; border-radius: 50%; font-size: 15px; color: #7a4a00;
+  background: radial-gradient(circle at 35% 30%, #fff4a8 0%, #ffd60a 45%, #e0a100 100%); border: 2px solid #8a5a00; }
+.theme-mario64 .row .name { color: #fff; text-shadow: 2px 2px 0 #10183a; font-size: 18px; }
+.theme-mario64 .row .count { color: #ffd60a; text-shadow: 2px 2px 0 #10183a; font-size: 20px; }
+.theme-mario64 .row .kind { color: #fff !important; font-family: "Segoe UI", sans-serif; text-shadow: 1px 1px 0 #10183a; }
+.theme-mario64 .row.leading { outline: 0; border-color: #ffd60a; }
+.theme-mario64 .row .star { display: inline; position: relative; color: #ffd60a; font-size: 22px; text-shadow: 2px 2px 0 #10183a;
+  animation: m64spin 1.6s linear infinite; }
+@keyframes m64spin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+.theme-mario64 .cooldown { background: #1d4fd0; border: 3px solid #fff; border-radius: 12px; color: #fff;
+  font-family: "Arial Black", sans-serif; text-shadow: 2px 2px 0 #10183a; }
+/* minimal: keep names readable on the coloured bars; only the number shows help/hinder colour */
+.theme-minimal .row .name, .theme-minimal .row .count { color: #f1f2f6; }
+.theme-minimal .row .fill { opacity: 0.22; }

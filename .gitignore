@@ -1,0 +1,26 @@
+# Build output and downloaded packages
+companion/node_modules/
+companion/src-tauri/target/
+companion/src-tauri/gen/
+
+# Never commit the game, ROMs or save files
+*.z64
+*.n64
+*.v64
+*.rom
+sm64coopdx.exe
+*.sav
+*.modfs
+baserom*
+
+# Release files are uploaded to GitHub Releases, not committed
+*.zip
+*.exe
+
+# Editor / OS clutter
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+.DS_Store
+__pycache__/

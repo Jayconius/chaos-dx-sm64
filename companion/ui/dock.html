@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chaos Dock</title>
+<link rel="stylesheet" href="/style.css">
+<style> body { padding: 10px; } #vote { margin-bottom: 10px; } .vote h2 { font-size: 17px; } .row .name { font-size: 14px; } </style>
+</head>
+<body>
+<div id="vote"></div>
+<div id="stats"></div>
+<script src="/shared.js"></script>
+<script>
+  live((s) => {
+    document.getElementById("vote").innerHTML = voteHtml(s) || cooldownHtml(s);
+    document.getElementById("stats").innerHTML = statsHtml(s);
+  });
+</script>
+</body>
+</html>

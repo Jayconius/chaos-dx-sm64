@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1d4fd0"/>
+      <stop offset="1" stop-color="#0c1f63"/>
+    </linearGradient>
+    <pattern id="stars" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M40 30 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1z" fill="#ffffff" opacity="0.07"/>
+    </pattern>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4a8"/>
+      <stop offset="0.5" stop-color="#ffd60a"/>
+      <stop offset="1" stop-color="#e0a100"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="320" rx="28" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="28" fill="url(#stars)"/>
+  <rect x="10" y="10" width="1260" height="300" rx="22" fill="none" stroke="#ffffff" stroke-width="6"/>
+
+  <!-- badge: gold rounded square with a red lightning bolt (same as the app icon) -->
+  <g transform="translate(70 70)">
+    <rect width="180" height="180" rx="40" fill="#1e202c"/>
+    <rect x="12" y="12" width="156" height="156" rx="32" fill="url(#gold)"/>
+    <path d="M105 22 L50 101 L87 101 L71 158 L128 72 L92 72 L112 22 Z" fill="#e63232" stroke="#7a1010" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+
+  <!-- title: multicolour outlined letters -->
+  <g font-family="'Arial Black', 'Segoe UI Black', Impact, sans-serif" font-size="118" font-weight="900"
+     stroke="#10183a" stroke-width="10" paint-order="stroke" stroke-linejoin="round">
+    <text x="300" y="185" fill="#ff3b30">C</text>
+    <text x="392" y="185" fill="#ffd60a">H</text>
+    <text x="490" y="185" fill="#34c759">A</text>
+    <text x="582" y="185" fill="#5ac8fa">O</text>
+    <text x="680" y="185" fill="#ff3b30">S</text>
+    <text x="808" y="185" fill="#ffd60a">D</text>
+    <text x="906" y="185" fill="#34c759">X</text>
+  </g>
+  <text x="304" y="250" font-family="'Segoe UI', Arial, sans-serif" font-size="38" font-weight="700" fill="#ffffff"
+        stroke="#10183a" stroke-width="6" paint-order="stroke">SM64 · Twitch Integrated · for sm64coopdx</text>
+</svg>

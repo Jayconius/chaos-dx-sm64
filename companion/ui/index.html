@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chaos Companion</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  body { padding: 18px; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  header h1 { font-size: 22px; } header h1 span { color: var(--gold); }
+  .layout { display: grid; grid-template-columns: 300px 1fr; gap: 16px; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .box h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  input[type=text] { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); font-size: 15px; }
+  input[type=range] { width: 100%; }
+  select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); font-size: 14px; }
+  .preview { height: 330px; border-radius: 8px; overflow: hidden;
+             background: repeating-conic-gradient(#2a2d3b 0% 25%, #22242f 0% 50%) 50% / 24px 24px; }
+  .preview iframe { width: 100%; height: 100%; border: 0; background: transparent; }
+  button { margin-top: 12px; width: 100%; padding: 10px; border: 0; border-radius: 8px; background: var(--gold); color: #1b1b1b; font-weight: 700; font-size: 15px; cursor: pointer; }
+  button.ghost { background: var(--panel-2); color: var(--text); }
+  .status { font-size: 13px; margin-top: 10px; color: var(--muted); }
+  .url { display: flex; gap: 6px; margin-top: 4px; }
+  .url input { font-size: 12px; }
+  .url button { width: auto; margin: 0; padding: 6px 10px; font-size: 12px; }
+  label.check { display: flex; align-items: center; gap: 8px; color: var(--text); margin-top: 12px; cursor: pointer; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--line);
+          border-radius: 999px; padding: 4px 6px 4px 10px; font-size: 13px; }
+  .chip button { width: 20px; height: 20px; margin: 0; padding: 0; border-radius: 50%; background: #3a3e52; color: var(--text);
+                 font-size: 12px; line-height: 20px; }
+  .addrow { display: flex; gap: 6px; margin-top: 8px; }
+  .addrow select { flex: 1; }
+  .addrow button { width: auto; margin: 0; padding: 8px 10px; font-size: 13px; white-space: nowrap; }
+  .addrow button:disabled, .addrow select:disabled { opacity: 0.45; cursor: default; }
+  .tip { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+  #vote:empty { display: none; }
+  #vote { margin-bottom: 12px; }
+  @media (max-width: 760px) { .layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header><h1>Chaos <span>Companion</span></h1><span class="muted" id="server"></span></header>
+<div class="layout">
+  <div>
+    <div class="box">
+      <h3>Twitch</h3>
+      <label for="channel">Your Twitch channel name</label>
+      <input id="channel" type="text" placeholder="e.g. mychannel" spellcheck="false">
+      <label>Co-hosts (their Chaos Companion votes count too)</label>
+      <div id="cohosts" class="chips"></div>
+      <div class="addrow">
+        <select id="cohostPick"></select>
+        <button id="addCohost" class="ghost">+ Add co-host</button>
+      </div>
+      <div class="tip" id="cohostNote"></div>
+      <label for="options">Vote options shown in game: <b id="optionsValue">4</b></label>
+      <input id="options" type="range" min="1" max="9" value="4">
+      <label for="theme">Overlay style (applies straight away)</label>
+      <select id="theme">
+        <option value="classic">Classic (dark panel)</option>
+        <option value="transparent">Transparent (outlined text)</option>
+        <option value="minimal">Minimal (small and compact)</option>
+        <option value="mario64">Mario 64</option>
+      </select>
+      <label class="check"><input id="tray" type="checkbox"> Minimize to system tray</label>
+      <button id="save">Save and connect</button>
+      <button id="reconnect" class="ghost">Reconnect chat</button>
+      <div class="status" id="chatStatus">Not connected</div>
+      <div class="tip">Reads your chat as a guest: no login or password needed. Chatters vote by typing a number;
+        each person's first vote counts.</div>
+    </div>
+    <div class="box" style="margin-top:12px">
+      <h3>OBS</h3>
+      <label>Overlay (Browser Source, about 520 x 520)</label>
+      <div class="url"><input id="overlayUrl" type="text" readonly><button data-copy="overlayUrl">Copy</button></div>
+      <label>Stats dock (Docks &rsaquo; Custom Browser Docks)</label>
+      <div class="url"><input id="dockUrl" type="text" readonly><button data-copy="dockUrl">Copy</button></div>
+      <div class="tip">In game, the host sets Chaos to <b>Source 3 (Twitch)</b> in the mod menu, or types <b>/chaos twitch</b>.
+        Co-hosts: the host types <b>/chaos cohost &lt;player name&gt;</b>; the co-host runs this app with their own channel.
+        Add <b>?theme=mario64</b> (or classic, transparent, minimal) to the overlay URL to force a style for one scene;
+        a URL with ?theme= ignores the style picked here. Add <b>?preview=1</b> to see a sample vote in OBS while you set it up.</div>
+    </div>
+    <div class="box" style="margin-top:12px">
+      <h3>Style preview</h3>
+      <div class="preview"><iframe id="preview" title="Overlay preview"></iframe></div>
+    </div>
+  </div>
+  <div class="box">
+    <div id="vote"></div>
+    <div id="stats"></div>
+  </div>
+</div>
+<script src="shared.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const invoke = window.__TAURI__.core.invoke;
+  let filled = false;
+
+  $("options").addEventListener("input", () => { $("optionsValue").textContent = $("options").value; });
+  const showPreview = () => { $("preview").src = `http://127.0.0.1:7480/overlay?preview=1&theme=${$("theme").value}`; };
+  $("theme").addEventListener("change", () => {
+    showPreview();
+    invoke("set_theme", { theme: $("theme").value });   // applies to OBS straight away, no Save needed
+  });
+  $("save").addEventListener("click", async () => {
+    await invoke("save_settings", { channel: $("channel").value, options: Number($("options").value), theme: $("theme").value,
+                                    minimizeToTray: $("tray").checked });
+    $("chatStatus").textContent = "Saved. Connecting...";
+  });
+  $("reconnect").addEventListener("click", () => invoke("reconnect"));
+  $("addCohost").addEventListener("click", () => {
+    const name = $("cohostPick").value;
+    if (name) invoke("set_cohost", { name, add: true });
+  });
+  $("cohosts").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-remove]");
+    if (b) invoke("set_cohost", { name: b.dataset.remove, add: false });
+  });
+  let lastPick = "";
+  function drawCohosts(s) {
+    const g = s.game || {};
+    const isHost = s.gameOnline && g.role === "host";
+    const people = s.gameOnline ? (g.people || []) : [];
+    const cohosts = people.filter((p) => p.role === "cohost");
+    $("cohosts").innerHTML = cohosts.length
+      ? cohosts.map((p) => `<span class="chip"><span class="dot ${p.connected === 1 ? "on" : ""}"></span>${esc(p.display)}${
+          p.display.toLowerCase() !== p.game_name.toLowerCase() ? ` <span class="muted">(${esc(p.game_name)})</span>` : ""}${
+          isHost ? `<button title="Remove" data-remove="${esc(p.game_name)}">&times;</button>` : ""}</span>`).join("")
+      : `<span class="muted" style="font-size:13px">None yet</span>`;
+    // players in the game who aren't the host or a co-host already
+    const taken = new Set(people.map((p) => p.game_name.toLowerCase()));
+    const choices = (g.players || []).filter((n) => !taken.has(n.toLowerCase()));
+    const html = choices.length ? choices.map((n) => `<option value="${esc(n)}">${esc(n)}</option>`).join("")
+                                : `<option value="">No other players in the game</option>`;
+    const key = html + isHost;
+    if (key !== lastPick) { $("cohostPick").innerHTML = html; lastPick = key; }
+    $("cohostPick").disabled = !isHost || !choices.length;
+    $("addCohost").disabled = !isHost || !choices.length;
+    $("cohostNote").textContent = !s.gameOnline ? "Host a game with Chaos on to add co-hosts."
+      : isHost ? "Pick a player who's in your game. They run this app with their own channel."
+      : "Only the host can add co-hosts.";
+  }
+  document.querySelectorAll("[data-copy]").forEach((b) => b.addEventListener("click", async () => {
+    await navigator.clipboard.writeText($(b.dataset.copy).value);
+    b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1200);
+  }));
+
+  live((s) => {
+    if (!filled) {
+      $("channel").value = s.settings.channel;
+      $("options").value = s.settings.options;
+      $("optionsValue").textContent = s.settings.options;
+      $("overlayUrl").value = s.urls.overlay;
+      $("dockUrl").value = s.urls.dock;
+      $("theme").value = s.settings.theme || "classic";
+      $("tray").checked = !!s.settings.minimize_to_tray;
+      showPreview();
+      filled = true;
+    }
+    $("chatStatus").innerHTML = `<span class="dot ${s.chat.connected ? "on" : ""}"></span>${esc(s.chat.status)}`;
+    $("server").textContent = s.server;
+    drawCohosts(s);
+    $("vote").innerHTML = voteHtml(s) || cooldownHtml(s);
+    $("stats").innerHTML = statsHtml(s);
+  });
+</script>
+</body>
+</html>

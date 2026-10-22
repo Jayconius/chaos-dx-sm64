@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chaos Overlay</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  /* OBS browser source: transparent, panel in the bottom-left; size the source about 520 x 520 */
+  body { padding: 12px; }
+  #root { position: fixed; left: 12px; bottom: 12px; width: 480px; display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body class="transparent">
+<div id="root"></div>
+<script src="/shared.js"></script>
+<script>
+  // ?theme=classic|transparent|minimal|mario64 overrides the style chosen in the app (handy per OBS scene).
+  // ?preview=1 shows a sample vote whenever no real vote is open (used by the app's style preview).
+  const params = new URLSearchParams(location.search);
+  live((s) => {
+    document.body.className = "transparent theme-" + (params.get("theme") || s.settings.theme || "classic");
+    let html = voteHtml(s);
+    if (!html && params.get("preview")) html = voteHtml(sampleState(s.settings.options));
+    document.getElementById("root").innerHTML = html || cooldownHtml(s);
+  });
+</script>
+</body>
+</html>
