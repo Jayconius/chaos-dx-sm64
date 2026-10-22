@@ -28,7 +28,7 @@ The game itself is **not** included. You need your own copy of sm64coopdx. Built
 ## What it does
 
 - **65 effects**: 29 Help, 32 Hinder and 4 rare bosses. Movement, controls, weather, falling meteors and bombs,
-  a Boo you can barely steer, a bird that carries you off, Hot Potato, Lights Out and more.
+  a Boo you can barely steer, a bird that carries you off, Hot Potato, Lights Out and more. See the [full effects list](EFFECTS.md) with copyable commands.
 - **Three ways to pick effects**: random (RNG), lobby vote (`/vote 1-9`), or Twitch chat vote (with the Companion app).
 - **Greed meter**: if the lobby keeps voting Help, fewer Help options show up; vote Hinder and they come back.
   Three Hinders in a row earns a longer Help (streak bonus).
@@ -71,7 +71,7 @@ Pause the game, open the **mod menu**, and find **Chaos settings**:
 | `/vote 1`-`9` | Everyone | Vote in a lobby vote |
 | `/chaos auto`, `/chaos vote`, `/chaos twitch`, `/chaos off` | Host | Pick how effects are chosen |
 | `/chaos now <effect>` | Host | Fire an effect right now (e.g. `/chaos now meteor_shower`) |
-| `/chaos list` | Host | Show every effect and its name for `/chaos now` |
+| `/chaos list` | Host | Show every effect and its name for `/chaos now` (also on the [effects list](EFFECTS.md)) |
 | `/chaos effects` | Host | Open the Effect Rarity screen |
 | `/chaos clear` | Host | Stop all active effects |
 | `/chaos enable <effect>` / `/chaos disable <effect>` | Host | Turn an effect on or off (`all` works too) |
