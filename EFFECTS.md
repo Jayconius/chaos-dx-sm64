@@ -6,6 +6,7 @@ paste it into the game chat and press Enter.
 - Only the **host** can use these commands.
 - To turn an effect off instead, use `/chaos disable <effect>` (for example `/chaos disable drunk`), or set its rarity to 0 in **Effect Rarity**.
 - `/chaos list` shows the same list in the game.
+- **Rarity** is how often an effect is picked, from 0 (off) to 10 (very common). 5 is normal, so an effect at 10 shows up twice as often as one at 5. The numbers below are the defaults; change them in the game under **Effect Rarity** (mod menu, or `/chaos effects`).
 
 **65 effects:** 29 Help, 32 Hinder and 4 bosses.
 
@@ -13,175 +14,175 @@ paste it into the game chat and press Enter.
 
 ## Help effects
 
-**Speed Boost**
+**Speed Boost** · default rarity 6
 
 ```
 /chaos now speed_boost
 ```
 
-**Moon Gravity**
+**Moon Gravity** · default rarity 6
 
 ```
 /chaos now moon_gravity
 ```
 
-**Super Jump**
+**Super Jump** · default rarity 6
 
 ```
 /chaos now super_jump
 ```
 
-**Tiny Mario**
+**Tiny Mario** · default rarity 5
 
 ```
 /chaos now tiny_mario
 ```
 
-**Full Heal**
+**Full Heal** · default rarity 5
 
 ```
 /chaos now heal
 ```
 
-**Wing Cap**
+**Wing Cap** · default rarity 5
 
 ```
 /chaos now wing_cap
 ```
 
-**Metal Cap**
+**Metal Cap** · default rarity 4
 
 ```
 /chaos now metal_cap
 ```
 
-**Coin Shower**
+**Coin Shower** · default rarity 5
 
 ```
 /chaos now coin_shower
 ```
 
-**Bounce House**
+**Bounce House** · default rarity 5
 
 ```
 /chaos now bounce_house
 ```
 
-**Featherweight**
+**Featherweight** · default rarity 5
 
 ```
 /chaos now featherweight
 ```
 
-**Second Wind**
+**Second Wind** · default rarity 5
 
 ```
 /chaos now second_wind
 ```
 
-**Coin Magnet**
+**Coin Magnet** · default rarity 4
 
 ```
 /chaos now magnet
 ```
 
-**Shield Bubble**
+**Shield Bubble** · default rarity 4
 
 ```
 /chaos now shield_bubble
 ```
 
-**Tailwind**
+**Tailwind** · default rarity 5
 
 ```
 /chaos now tailwind
 ```
 
-**Hover Boots**
+**Hover Boots** · default rarity 5
 
 ```
 /chaos now hover_boots
 ```
 
-**Rainbow Star**
+**Rainbow Star** · default rarity 3
 
 ```
 /chaos now rainbow_star
 ```
 
-**Vanish Cap**
+**Vanish Cap** · default rarity 4
 
 ```
 /chaos now vanish_cap
 ```
 
-**1-Up**
+**1-Up** · default rarity 3
 
 ```
 /chaos now one_up
 ```
 
-**Regeneration**
+**Regeneration** · default rarity 5
 
 ```
 /chaos now regeneration
 ```
 
-**Safety Net**
+**Safety Net** · default rarity 4
 
 ```
 /chaos now safety_net
 ```
 
-**No Fall Damage**
+**No Fall Damage** · default rarity 5
 
 ```
 /chaos now no_fall_damage
 ```
 
-**Turbo Swim**
+**Turbo Swim** · default rarity 3
 
 ```
 /chaos now turbo_swim
 ```
 
-**Fireproof**
+**Fireproof** · default rarity 4
 
 ```
 /chaos now fireproof
 ```
 
-**Long Jump Rocket**
+**Long Jump Rocket** · default rarity 5
 
 ```
 /chaos now long_jump_rocket
 ```
 
-**Power Pound**
+**Power Pound** · default rarity 4
 
 ```
 /chaos now power_pound
 ```
 
-**Enemy Freeze**
+**Enemy Freeze** · default rarity 4
 
 ```
 /chaos now enemy_freeze
 ```
 
-**Star Radar**
+**Star Radar** · default rarity 3
 
 ```
 /chaos now star_radar
 ```
 
-**Regroup**
+**Regroup** · default rarity 3
 
 ```
 /chaos now regroup
 ```
 
-**Guardian Angel**
+**Guardian Angel** · default rarity 3
 
 ```
 /chaos now guardian_angel
@@ -189,193 +190,193 @@ paste it into the game chat and press Enter.
 
 ## Hinder effects
 
-**Heavy Gravity**
+**Heavy Gravity** · default rarity 6
 
 ```
 /chaos now heavy_gravity
 ```
 
-**Slow Motion Legs**
+**Slow Motion Legs** · default rarity 6
 
 ```
 /chaos now slow_walk
 ```
 
-**Giant Mario**
+**Giant Mario** · default rarity 5
 
 ```
 /chaos now giant_mario
 ```
 
-**Brain Freeze**
+**Brain Freeze** · default rarity 5
 
 ```
 /chaos now freeze
 ```
 
-**Surprise Shove**
+**Surprise Shove** · default rarity 5
 
 ```
 /chaos now knockback
 ```
 
-**Earthquake**
+**Earthquake** · default rarity 5
 
 ```
 /chaos now earthquake
 ```
 
-**Blizzard**
+**Blizzard** · default rarity 4
 
 ```
 /chaos now blizzard
 ```
 
-**Gravity Well**
+**Gravity Well** · default rarity 4
 
 ```
 /chaos now gravity_well
 ```
 
-**Fire Storm**
+**Fire Storm** · default rarity 4
 
 ```
 /chaos now fire_storm
 ```
 
-**Meteor Shower**
+**Meteor Shower** · default rarity 3
 
 ```
 /chaos now meteor_shower
 ```
 
-**Sticky Shoes**
+**Sticky Shoes** · default rarity 5
 
 ```
 /chaos now sticky_shoes
 ```
 
-**Rubber Legs**
+**Rubber Legs** · default rarity 5
 
 ```
 /chaos now rubber_legs
 ```
 
-**Spaghetti Controls**
+**Spaghetti Controls** · default rarity 4
 
 ```
 /chaos now spaghetti_controls
 ```
 
-**Reverse Controls**
+**Reverse Controls** · default rarity 4
 
 ```
 /chaos now reverse_controls
 ```
 
-**Heavy Cap**
+**Heavy Cap** · default rarity 5
 
 ```
 /chaos now heavy_cap
 ```
 
-**Slippery Floor**
+**Slippery Floor** · default rarity 5
 
 ```
 /chaos now slippery_floor
 ```
 
-**Dizzy**
+**Dizzy** · default rarity 4
 
 ```
 /chaos now dizzy
 ```
 
-**Drunk**
+**Drunk** · default rarity 3
 
 ```
 /chaos now drunk
 ```
 
-**The Floor Is Lava**
+**The Floor Is Lava** · default rarity 4
 
 ```
 /chaos now lava_floor
 ```
 
-**Wind Gusts**
+**Wind Gusts** · default rarity 5
 
 ```
 /chaos now wind_gusts
 ```
 
-**Ice Rink**
+**Ice Rink** · default rarity 4
 
 ```
 /chaos now ice_rink
 ```
 
-**Lights Out**
+**Lights Out** · default rarity 3
 
 ```
 /chaos now darkness
 ```
 
-**Thick Fog**
+**Thick Fog** · default rarity 3
 
 ```
 /chaos now fog
 ```
 
-**Rising Water**
+**Rising Water** · default rarity 2
 
 ```
 /chaos now rising_water
 ```
 
-**Bomb Rain**
+**Bomb Rain** · default rarity 3
 
 ```
 /chaos now bomb_rain
 ```
 
-**Lightning Storm**
+**Lightning Storm** · default rarity 3
 
 ```
 /chaos now lightning_storm
 ```
 
-**Hot Potato**
+**Hot Potato** · default rarity 3
 
 ```
 /chaos now hot_potato
 ```
 
-**Lava Rising**
+**Lava Rising** · default rarity 2
 
 ```
 /chaos now lava_rising
 ```
 
-**Low-Res Mode**
+**Low-Res Mode** · default rarity 3
 
 ```
 /chaos now low_res
 ```
 
-**Spotlight**
+**Spotlight** · default rarity 3
 
 ```
 /chaos now spotlight
 ```
 
-**Boo Mode**
+**Boo Mode** · default rarity 3
 
 ```
 /chaos now boo_mode
 ```
 
-**Bird Attack**
+**Bird Attack** · default rarity 3
 
 ```
 /chaos now bird_attack
@@ -385,25 +386,25 @@ paste it into the game chat and press Enter.
 
 Bosses are rare, last 1 to 3 minutes and never drop a star.
 
-**Mega Goomba**
+**Mega Goomba** · default rarity 1
 
 ```
 /chaos now boss_goomba
 ```
 
-**Wiggler**
+**Wiggler** · default rarity 1
 
 ```
 /chaos now boss_wiggler
 ```
 
-**King Whomp**
+**King Whomp** · default rarity 1
 
 ```
 /chaos now boss_king_whomp
 ```
 
-**Big Boo**
+**Big Boo** · default rarity 1
 
 ```
 /chaos now boss_big_boo
