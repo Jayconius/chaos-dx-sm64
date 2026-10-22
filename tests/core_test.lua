@@ -1,5 +1,5 @@
-﻿-- Run: lua tests/core_test.lua   (from the repository root, with Lua 5.4)
-dofile("mod/chaos/a_core.lua")
+-- Run: lua tests/core_test.lua   (from D:\sm64coopdx-private-event, using the MSYS2 MINGW64 `lua`)
+dofile("mods/chaos/a_core.lua")
 local C = Chaos
 
 local failed = 0
@@ -152,6 +152,24 @@ for _ = 1, 300 do
 end
 check(not sawBoss, "blocked group is never rolled or offered")
 C.blocked = {}
+
+-- 10d. minPlayers: a 2+ player effect is never offered or rolled with 1 player, but is with 2
+C.register({ id = "regroupT", kind = "help", minPlayers = 2, weight = 50 })
+C.playerCount = 1
+local saw = false
+for _ = 1, 200 do
+    if C.roll(rng) == "regroupT" then saw = true end
+    for _, o in ipairs(C.pick_options(4, rng)) do if o == "regroupT" then saw = true end end
+end
+check(not saw, "minPlayers effect never picked with 1 player")
+C.playerCount = 2
+saw = false
+for _ = 1, 200 do
+    for _, o in ipairs(C.pick_options(4, rng)) do if o == "regroupT" then saw = true end end
+end
+check(saw, "minPlayers effect can be picked with 2 players")
+C.effects.regroupT.enabled = false
+C.playerCount = 1
 
 -- 11. register validation
 local ok = pcall(C.register, { id = "bad", kind = "nope" })

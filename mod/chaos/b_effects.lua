@@ -50,7 +50,7 @@ function C.blast(o, x, y, z, scale, radius, damage)
     local m = gMarioStates[0]
     local dx, dy, dz = m.pos.x - x, m.pos.y - y, m.pos.z - z
     if dx * dx + dz * dz < radius * radius and dy > -100 and dy < radius
-        and m.invincTimer <= 0 and m.health > 0x100 and (m.flags & MARIO_METAL_CAP) == 0 then
+        and m.invincTimer <= 0 and m.health > 0x100 and (m.flags & MARIO_METAL_CAP) == 0 and not C.fireproof then
         o.oDamageOrCoinValue = damage
         o.oPosX, o.oPosY, o.oPosZ = x, y, z   -- knockback points away from the impact
         take_damage_and_knock_back(m, o)
@@ -424,6 +424,7 @@ local function flame_trail_init(o)
 end
 
 local function flame_trail_loop(o)
+    o.oAnimState = o.oAnimState + 1   -- flicker like the game's flames
     if o.oTimer > 10 then
         obj_mark_for_deletion(o)
         return
@@ -440,6 +441,7 @@ end
 
 local function faller_loop(o)
     local small = (o.oBehParams2ndByte == 1)
+    o.oAnimState = o.oAnimState + 1   -- flicker like the game's flames
     o.oVelY = o.oVelY - 1.8
     obj_move_xyz_using_fvel_and_yaw(o)
     if o.oTimer % (small and 4 or 2) == 0 then

@@ -417,6 +417,9 @@ C.register({
 local function bomb_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     cur_obj_scale(1.6)
+    -- the bob-omb's own walk animation (legs kick while it falls) instead of a frozen pose
+    o.oAnimations = gObjectAnimations.bobomb_seg8_anims_0802396C
+    obj_init_animation_with_accel_and_sound(o, 0, 2.0)
 end
 
 local function bomb_loop(o)

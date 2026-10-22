@@ -13,7 +13,7 @@ how effects are chosen: at random, by a vote in the game, or by **your Twitch ch
 
 | | Download | What it is |
 |---|---|---|
-| **Chaos DX mod** | [**Latest mod release**](https://github.com/Jayconius/chaos-dx-sm64/releases/tag/mod-v1.0.0) | The mod for sm64coopdx (a `chaos` folder) |
+| **Chaos DX mod** | [**Latest mod release**](https://github.com/Jayconius/chaos-dx-sm64/releases/tag/mod-v1.1.0) | The mod for sm64coopdx (a `chaos` folder) |
 | **Chaos Companion app** | [**Latest app release**](https://github.com/Jayconius/chaos-dx-sm64/releases/tag/companion-v0.1.0) | Optional Windows app for Twitch chat voting and OBS overlays |
 
 The game itself is **not** included. You need your own copy of sm64coopdx. Built and tested with **sm64coopdx v1.5.1**.
@@ -27,18 +27,19 @@ The game itself is **not** included. You need your own copy of sm64coopdx. Built
 
 ## What it does
 
-- **52 effects**: 16 Help, 32 Hinder and 4 rare bosses. Movement, controls, weather, falling meteors and bombs,
+- **65 effects**: 29 Help, 32 Hinder and 4 rare bosses. Movement, controls, weather, falling meteors and bombs,
   a Boo you can barely steer, a bird that carries you off, Hot Potato, Lights Out and more.
 - **Three ways to pick effects**: random (RNG), lobby vote (`/vote 1-9`), or Twitch chat vote (with the Companion app).
 - **Greed meter**: if the lobby keeps voting Help, fewer Help options show up; vote Hinder and they come back.
   Three Hinders in a row earns a longer Help (streak bonus).
 - **Bosses** (Mega Goomba, Wiggler, King Whomp, Big Boo): beatable anywhere, last 1-3 minutes, and never drop a star.
 - **Everything is synced** from the host, so every player sees the same chaos.
-- **Host settings** in the mod menu: turn single effects off, set timings, vote options, boss placement and more.
+- **Host settings** in the mod menu: set how often each effect shows up (Effect Rarity), timings, vote options,
+  boss placement and more. Works with a controller.
 
 ## Installing the mod
 
-1. Download **`chaos-dx-mod.zip`** from the [mod release](https://github.com/Jayconius/chaos-dx-sm64/releases/tag/mod-v1.0.0).
+1. Download **`chaos-dx-mod.zip`** from the [mod release](https://github.com/Jayconius/chaos-dx-sm64/releases/tag/mod-v1.1.0).
 2. Unzip it. You get a folder called **`chaos`**. Keep that name, because the Companion app finds the mod by it.
 3. Put the `chaos` folder in the **`mods`** folder next to `sm64coopdx.exe`
    (or in `%APPDATA%\sm64coopdx\mods`, which every copy of the game on your PC shares; just don't use both).
@@ -51,16 +52,17 @@ Pause the game, open the **mod menu**, and find **Chaos settings**:
 
 | Setting | What it does |
 |---|---|
-| **Source** | 0 Off, 1 Random (RNG), 2 Lobby votes, 3 Twitch votes |
+| **Effect rarity** | Opens a list of every effect with a 0-10 rarity each (0 = off, 1 = rare, 5 = normal, 10 = very common). Saved between sessions. Also opens with `/chaos effects` |
+| **Greed** | Off, Mild or Harsh (click to change) |
+| **Boss spawns** | One per level, near the host, or at the biggest group of players (click to change) |
+| **Source** | Off, Auto (RNG), Lobby votes or Twitch votes |
 | **Vote options** | 1-9 options per vote (the Companion app sets this while it runs) |
-| **Vote length / Time between effects** | In seconds |
-| **Greed** | Off, Mild or Harsh |
-| **Twitch mode: lobby /vote counts too** | Lets players in the game vote alongside Twitch chat |
-| **Boss spawns** | 0 one per level, 1 near the host, 2 at the biggest group of players |
-| **Keep chaos going during boss fights** | Untick to pause votes and effects while a boss is out |
-| **Targeted Hinders hit everyone** | On: Boo Mode, Bird Attack, Brain Freeze and Surprise Shove hit the whole lobby. Off: one random player |
-| **Targeted Helps hit everyone** | On: Full Heal, Wing/Metal Cap, Shield Bubble and Rainbow Star go to everyone. Off: one lucky player |
-| **Effect tick boxes** | Untick any effect you don't want. Your choices are saved |
+| **Vote length / Between effects** | In seconds, in steps of 5 |
+| **Twitch: lobby /vote counts too** | Lets players in the game vote alongside Twitch chat |
+| **Show lobby luck meter** | Shows the greed meter on screen |
+| **Chaos during boss fights** | Untick to pause votes and effects while a boss is out |
+| **Hinders on one player hit everyone** | On: Boo Mode, Bird Attack, Brain Freeze and Surprise Shove hit the whole lobby. Off: one random player |
+| **Helps on one player hit everyone** | On: Full Heal, Wing/Metal Cap, Shield Bubble and Rainbow Star go to everyone. Off: one lucky player |
 
 ### Chat commands
 
@@ -70,6 +72,7 @@ Pause the game, open the **mod menu**, and find **Chaos settings**:
 | `/chaos auto`, `/chaos vote`, `/chaos twitch`, `/chaos off` | Host | Pick how effects are chosen |
 | `/chaos now <effect>` | Host | Fire an effect right now (e.g. `/chaos now meteor_shower`) |
 | `/chaos list` | Host | Show every effect and its name for `/chaos now` |
+| `/chaos effects` | Host | Open the Effect Rarity screen |
 | `/chaos clear` | Host | Stop all active effects |
 | `/chaos enable <effect>` / `/chaos disable <effect>` | Host | Turn an effect on or off (`all` works too) |
 | `/chaos cohost <player>` / `/chaos uncohost <player>` / `/chaos cohosts` | Host | Manage Twitch co-hosts |

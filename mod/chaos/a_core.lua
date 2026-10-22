@@ -10,6 +10,7 @@ C.order = {}        -- ids in registration order
 C.meter = 0         -- greed meter, -100 (evil lobby, Help rewarded) .. +100 (greedy lobby, Help punished)
 C.recent = {}       -- last fired ids, to avoid repeats
 C.blocked = {}      -- groups that can't be picked right now (e.g. { boss = true } while a boss is out)
+C.playerCount = 1   -- players in the lobby (the host updates it); effects with minPlayers need at least that many
 C.RECENT_MAX = 3
 C.METER_MAX = 100
 
@@ -24,6 +25,7 @@ local GREED_STEP = { [0] = 0, [1] = 8, [2] = 15 }
 -- Effect definition fields:
 --   id (string, unique), name, kind ("help" | "hinder"), scope ("player" | "world"),
 --   duration (seconds, 0 = instant), target ("all" | "random"), weight (default 1), enabled (default true),
+--   minPlayers (optional: only offered/rolled when at least this many players are in the lobby),
 --   onStart(entry), onMario(m, entry), onEnd(entry)  -- all optional
 function C.register(def)
     assert(type(def) == "table", "chaos: effect must be a table")
@@ -58,7 +60,8 @@ local function candidates(kind, taken)
     local list, total = {}, 0
     for _, id in ipairs(C.order) do
         local def = C.effects[id]
-        if def.enabled and def.kind == kind and not taken[id] and not (def.group and C.blocked[def.group]) then
+        if def.enabled and def.kind == kind and not taken[id] and not (def.group and C.blocked[def.group])
+            and (def.minPlayers == nil or C.playerCount >= def.minPlayers) then
             local w = def.weight
             -- avoid immediate repeats
             for _, r in ipairs(C.recent) do

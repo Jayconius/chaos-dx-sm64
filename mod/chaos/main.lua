@@ -8,8 +8,8 @@ local FPS = 30
 --------------------------------------------------------------------------------------------- sync state
 -- Set unconditionally at init so the host's values are what the lobby gets.
 gGlobalSyncTable.chaosSource = 1        -- 0 off, 1 auto (RNG), 2 lobby votes, 3 Twitch votes (companion app)
-gGlobalSyncTable.chaosVoteSecs = 20
-gGlobalSyncTable.chaosCoolSecs = 30
+gGlobalSyncTable.chaosVoteSecs = tonumber(mod_storage_load("voteSecs") or "") or 20
+gGlobalSyncTable.chaosCoolSecs = tonumber(mod_storage_load("coolSecs") or "") or 30
 gGlobalSyncTable.chaosGreed = 2         -- 0 off, 1 mild, 2 harsh
 gGlobalSyncTable.chaosShowMeter = true
 -- keep votes/effects coming while a boss is out? (saved for next time)
@@ -64,7 +64,8 @@ local active = {}       -- entries: { id, def, frames, target, seed, done = {} }
 
 local function applies_to(entry, m)
     if not gNetworkPlayers[m.playerIndex].connected then return false end
-    if entry.target >= 0 and gNetworkPlayers[m.playerIndex].globalIndex ~= entry.target then return false end
+    local target = tonumber(entry.target) or -1   -- an effect overwriting entry.target must not break every frame
+    if target >= 0 and gNetworkPlayers[m.playerIndex].globalIndex ~= target then return false end
     if C.filter ~= nil and not C.filter(m) then return false end
     return true
 end
@@ -598,6 +599,7 @@ end
 local function host_update()
     local src = gGlobalSyncTable.chaosSource
     C.settings.greed = gGlobalSyncTable.chaosGreed
+    C.playerCount = network_player_connected_count()
     C.settings.numOptions = math.max(1, math.min(MAX_OPTIONS, gGlobalSyncTable.chaosNumOptions))
     local cfg = {
         source = (src == 1) and "auto" or "vote",
@@ -780,18 +782,15 @@ local function clear_everyone()
     on_event_changed(0, "", payload)
 end
 
--- Per-effect on/off (host). Saved in this mod's storage (keys off_<id>), so choices carry over to the next session.
-local checkboxIndex = {}
-for _, id in ipairs(C.order) do
-    if mod_storage_load("off_" .. id) == "true" then C.effects[id].enabled = false end
-end
-
+-- Per-effect on/off for /chaos enable|disable: off = rarity 0, on = back to its default rarity (d_rarity.lua)
 local function set_effect_enabled(id, on)
     local def = C.effects[id]
     if def == nil then return false end
-    def.enabled = on
-    mod_storage_save("off_" .. id, tostring(not on))
-    if checkboxIndex[id] ~= nil then update_mod_menu_element_checkbox(checkboxIndex[id], on) end
+    if on then
+        if (def.rarity or 0) == 0 then C.set_rarity(id, C.default_rarity(id)) end
+    else
+        C.set_rarity(id, 0)
+    end
     return true
 end
 
@@ -829,7 +828,7 @@ local function on_chaos(msg)
     elseif cmd == "list" then
         for _, id in ipairs(C.order) do
             local def = C.effects[id]
-            djui_chat_message_create(def.kind .. ": " .. id .. " - " .. def.name .. (def.enabled and "" or " (OFF)"))
+            djui_chat_message_create(def.kind .. ": " .. id .. " - " .. def.name .. (def.enabled and (" (rarity " .. (def.rarity or 5) .. ")") or " (OFF)"))
         end
     elseif cmd == "cohost" or cmd == "uncohost" then
         -- find the player by (part of) their name
@@ -856,6 +855,8 @@ local function on_chaos(msg)
     elseif cmd == "cohosts" then
         local list = gGlobalSyncTable.chaosCohosts
         djui_chat_message_create("Chaos co-hosts: " .. ((list ~= "") and list or "none") .. ". /chaos cohost <name> to add, /chaos uncohost <name> to remove")
+    elseif cmd == "effects" or cmd == "rarity" then
+        C.open_rarity_menu()
     elseif cmd == "enable" or cmd == "disable" then
         local on = (cmd == "enable")
         if arg == "all" then
@@ -869,11 +870,11 @@ local function on_chaos(msg)
     else
         local names = { [0] = "Off", "Auto (RNG)", "Lobby votes", "Twitch votes" }
         djui_chat_message_create("Chaos: " .. names[gGlobalSyncTable.chaosSource] ..
-            ", meter " .. C.meter .. ". /chaos auto|vote|twitch|off|now [id]|clear|log|list|enable|disable|cohost <name>|uncohost <name>|cohosts")
+            ", meter " .. C.meter .. ". /chaos auto|vote|twitch|off|now [id]|clear|log|list|enable|disable|effects|cohost <name>|uncohost <name>|cohosts")
     end
     return true
 end
-hook_chat_command("chaos", "auto|vote|twitch|off|now|clear|log|list|enable|disable|cohost|uncohost|cohosts - control Chaos (host)", on_chaos)
+hook_chat_command("chaos", "auto|vote|twitch|off|now|clear|log|list|effects|enable|disable|cohost|uncohost|cohosts - control Chaos (host)", on_chaos)
 
 --------------------------------------------------------------------------------------------- mod menu
 local function host_only(fn)
@@ -883,39 +884,112 @@ local function host_only(fn)
 end
 
 hook_mod_menu_text("Chaos settings (host only)")
-hook_mod_menu_slider("Source: 0 Off, 1 RNG, 2 Lobby votes, 3 Twitch", 1, 0, 3, host_only(function(v)
-    gGlobalSyncTable.chaosSource = v
-    if v == 0 then clear_everyone() end
+
+-- Named choices are buttons that show the current choice and step to the next one when clicked.
+-- Numbers are typed into boxes. (Sliders were hard to set to an exact number.)
+local SOURCE_NAMES = { [0] = "Off", "Auto (RNG)", "Lobby votes", "Twitch votes" }
+local GREED_NAMES = { [0] = "Off", "Mild", "Harsh" }
+local BOSS_NAMES = { [0] = "One per level", "Near the host", "Biggest group" }
+local menuIds = {}
+
+local function choice_labels()
+    return {
+        source = "Source: " .. (SOURCE_NAMES[gGlobalSyncTable.chaosSource] or "?") .. "   (click to change)",
+        greed = "Greed: " .. (GREED_NAMES[gGlobalSyncTable.chaosGreed] or "?") .. "   (click to change)",
+        boss = "Boss spawns: " .. (BOSS_NAMES[gGlobalSyncTable.chaosBossSpawn or 0] or "?") .. "   (click to change)",
+    }
+end
+
+local function refresh_choice_labels()
+    local labels = choice_labels()
+    for key, index in pairs(menuIds) do
+        if labels[key] ~= nil then update_mod_menu_element_name(index, labels[key]) end
+    end
+end
+
+-- The game's slider moves one number EVERY FRAME while the stick is held (djui_slider.c, on_focus), so it races.
+-- This keeps it to one step (of `step`) at a time, at most every 8 frames (~0.25 s) while held.
+-- Mouse clicks/drags (jumps of more than one number) still go straight to the spot, snapped to the step.
+local function stepped_slider(label, key, low, high, step, current, apply)
+    local accepted, lastFrame, index = current, -100, nil
+    index = hook_mod_menu_slider(label, current, low, high, function(_, value)
+        if not network_is_server() then return end
+        value = math.floor(tonumber(value) or accepted)
+        if value == accepted then return end
+        local now = get_global_timer()
+        local new
+        if math.abs(value - accepted) == 1 then
+            if now - lastFrame < 8 then
+                update_mod_menu_element_slider(index, accepted)   -- too soon: hold it where it was
+                return
+            end
+            new = accepted + ((value > accepted) and step or -step)
+        else
+            new = low + math.floor((value - low) / step + 0.5) * step
+        end
+        new = math.max(low, math.min(high, new))
+        lastFrame, accepted = now, new
+        if new ~= value then update_mod_menu_element_slider(index, new) end
+        apply(new)
+        if key ~= nil then mod_storage_save(key, tostring(new)) end
+    end)
+    -- returns a setter so changes made elsewhere (chat commands) move the slider too
+    return function(v)
+        if v == accepted then return end
+        accepted = v
+        update_mod_menu_element_slider(index, v)
+    end, index
+end
+
+local labels = choice_labels()
+menuIds.rarity = hook_mod_menu_button("Effect rarity  (opens when you close this menu)", host_only(function()
+    C.open_rarity_menu()
+    djui_chat_message_create("\\#ffd060\\Close the pause menu to see Effect Rarity. (Tip: /chaos effects opens it straight away.)")
 end))
-hook_mod_menu_slider("Vote options (the companion app overrides this)", gGlobalSyncTable.chaosNumOptions, 1, 9,
-    host_only(function(v)
-        gGlobalSyncTable.chaosNumOptions = v
-        mod_storage_save("numOptions", tostring(v))
-    end))
-hook_mod_menu_checkbox("Twitch mode: lobby /vote counts too", gGlobalSyncTable.chaosTwitchPlusLobby, host_only(function(v)
+menuIds.greed = hook_mod_menu_button(labels.greed, host_only(function()
+    gGlobalSyncTable.chaosGreed = (gGlobalSyncTable.chaosGreed + 1) % 3
+    refresh_choice_labels()
+end))
+menuIds.boss = hook_mod_menu_button(labels.boss, host_only(function()
+    local v = ((gGlobalSyncTable.chaosBossSpawn or 0) + 1) % 3
+    gGlobalSyncTable.chaosBossSpawn = v
+    mod_storage_save("bossSpawn", tostring(v))
+    refresh_choice_labels()
+end))
+-- Click-to-change buttons stay together: the controller cursor skips a button sitting between two checkboxes
+-- (it jumps to the nearest item, and the checkbox straight below is nearer than the button's middle).
+-- the label shows the chosen source by name ("Source: Twitch vote"), since the bar itself can only show a number
+local function source_label() return "Source: " .. (SOURCE_NAMES[gGlobalSyncTable.chaosSource] or "?") end
+local sourceSliderIndex
+local set_source_slider
+set_source_slider, sourceSliderIndex = stepped_slider(source_label(), nil, 0, 3, 1,
+    gGlobalSyncTable.chaosSource, function(n)
+        gGlobalSyncTable.chaosSource = n
+        if n == 0 then clear_everyone() end
+        update_mod_menu_element_name(sourceSliderIndex, source_label())
+    end)
+stepped_slider("Vote options", "numOptions", 1, 9, 1, gGlobalSyncTable.chaosNumOptions,
+    function(n) gGlobalSyncTable.chaosNumOptions = n end)
+stepped_slider("Vote length (sec)", "voteSecs", 5, 60, 5, gGlobalSyncTable.chaosVoteSecs,
+    function(n) gGlobalSyncTable.chaosVoteSecs = n end)
+stepped_slider("Between effects (sec)", "coolSecs", 5, 120, 5, gGlobalSyncTable.chaosCoolSecs,
+    function(n) gGlobalSyncTable.chaosCoolSecs = n end)
+hook_mod_menu_checkbox("Twitch: lobby /vote counts too", gGlobalSyncTable.chaosTwitchPlusLobby, host_only(function(v)
     gGlobalSyncTable.chaosTwitchPlusLobby = v
     mod_storage_save("twitchPlusLobby", tostring(v))
 end))
-hook_mod_menu_slider("Vote length (seconds)", 20, 5, 60, host_only(function(v) gGlobalSyncTable.chaosVoteSecs = v end))
-hook_mod_menu_slider("Time between effects (seconds)", 30, 5, 120, host_only(function(v) gGlobalSyncTable.chaosCoolSecs = v end))
-hook_mod_menu_slider("Greed: 0 Off, 1 Mild, 2 Harsh", 2, 0, 2, host_only(function(v) gGlobalSyncTable.chaosGreed = v end))
 hook_mod_menu_checkbox("Show lobby luck meter", true, host_only(function(v) gGlobalSyncTable.chaosShowMeter = v end))
-hook_mod_menu_slider("Boss spawns: 0 Each level, 1 Near host, 2 Biggest group", gGlobalSyncTable.chaosBossSpawn or 0, 0, 2,
-    host_only(function(v)
-        gGlobalSyncTable.chaosBossSpawn = v
-        mod_storage_save("bossSpawn", tostring(v))
-    end))
-hook_mod_menu_checkbox("Targeted Hinders hit everyone (Boo, Bird, Freeze, Shove)", targetedHindersAll, host_only(function(v)
+hook_mod_menu_checkbox("Chaos during boss fights", gGlobalSyncTable.chaosDuringBoss, host_only(function(v)
+    gGlobalSyncTable.chaosDuringBoss = v
+    mod_storage_save("duringBoss", tostring(v))
+end))
+hook_mod_menu_checkbox("Hinders on one player hit everyone", targetedHindersAll, host_only(function(v)
     targetedHindersAll = v
     mod_storage_save("hindersAll", tostring(v))
 end))
-hook_mod_menu_checkbox("Targeted Helps hit everyone (Heal, Caps, Shield, Rainbow)", targetedHelpsAll, host_only(function(v)
+hook_mod_menu_checkbox("Helps on one player hit everyone", targetedHelpsAll, host_only(function(v)
     targetedHelpsAll = v
     mod_storage_save("helpsAll", tostring(v))
-end))
-hook_mod_menu_checkbox("Keep chaos going during boss fights", gGlobalSyncTable.chaosDuringBoss, host_only(function(v)
-    gGlobalSyncTable.chaosDuringBoss = v
-    mod_storage_save("duringBoss", tostring(v))
 end))
 hook_mod_menu_button("Trigger an effect now", host_only(function()
     local id = C.roll(math.random)
@@ -924,13 +998,22 @@ end))
 hook_mod_menu_button("Clear all effects", host_only(clear_everyone))
 hook_mod_menu_button("Show last 10 effects in chat", host_only(function() on_chaos("log") end))
 
--- one tick box per effect (saved for next time). Clients see the list but only the host's choices matter.
-hook_mod_menu_text("Effects: untick to turn one off")
-for _, id in ipairs(C.order) do
-    local def = C.effects[id]
-    checkboxIndex[id] = hook_mod_menu_checkbox(def.name .. ((def.kind == "help") and "  [Help]" or "  [Hinder]"),
-        def.enabled, host_only(function(v) set_effect_enabled(id, v) end))
-end
+-- keep the button labels right when settings change from chat commands (/chaos auto, /chaos twitch...)
+local lastLabels = ""
+hook_event(HOOK_UPDATE, function()
+    if get_global_timer() % 30 ~= 0 then return end
+    set_source_slider(gGlobalSyncTable.chaosSource)
+    update_mod_menu_element_name(sourceSliderIndex, source_label())
+    local l = choice_labels()
+    local key = l.source .. l.greed .. l.boss
+    if key ~= lastLabels then
+        lastLabels = key
+        refresh_choice_labels()
+    end
+end)
+
+-- the Effect Rarity screen (d_rarity.lua) draws on top of everything else
+hook_event(HOOK_ON_HUD_RENDER, function() if C.draw_rarity_menu then C.draw_rarity_menu() end end)
 
 ---------------------------------------------------------------------------------------------- API
 -- Other mods: _G.ChaosMod.register({ id=..., name=..., kind="help"|"hinder", duration=seconds, onMario=function(m, entry) end })

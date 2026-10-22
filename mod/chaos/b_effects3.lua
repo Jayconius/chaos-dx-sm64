@@ -541,6 +541,9 @@ local BOSS_SCALE = 4
 local function boss_init(o)
     o.oFlags = OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
     cur_obj_scale(BOSS_SCALE)
+    -- the Goomba walk animation (a custom object has none unless given one, which left it in a frozen pose)
+    o.oAnimations = gObjectAnimations.goomba_seg8_anims_0801DA4C
+    obj_init_animation_with_accel_and_sound(o, 0, 1.6)
     o.oHealth = 3
     o.oAction = 0
     o.oGravity = 2.5
@@ -716,6 +719,18 @@ hook_event(HOOK_UPDATE, function()
     end
 end)
 
+-- Wiggler's head builds its body with a model that only exists in Tiny-Huge Island (ERROR boxes anywhere else),
+-- so give each body part the proper model once it appears. Parts already sent away by remove_boss are skipped.
+hook_event(HOOK_UPDATE, function()
+    local o = obj_get_first_with_behavior_id(id_bhvWigglerBody)
+    while o ~= nil do
+        if o.oPosY > -10000 then   -- every frame: the "has model" check is fooled by the missing THI model
+            obj_set_model_extended(o, E_MODEL_WIGGLER_BODY)
+        end
+        o = obj_get_next_with_same_behavior_id(o)
+    end
+end)
+
 local function remove_boss(b)
     for _, bhv in ipairs({ b.bhv, id_bhvWigglerBody }) do
         local o = obj_get_first_with_behavior_id(bhv)
@@ -731,7 +746,18 @@ local function remove_boss(b)
             o = nxt
         end
     end
+    -- the boss music only stops by itself when the boss is beaten, so stop it here too (no-op if not playing)
+    stop_background_music((4 << 8) | SEQ_EVENT_BOSS)
 end
+
+-- a beaten Wiggler shrinks, drops its star and then walks around small forever (that's its THI behaviour);
+-- once it has shrunk and the game has stopped the boss music (60 frames into falling), clear it away
+hook_event(HOOK_UPDATE, function()
+    local head = obj_get_first_with_behavior_id(id_bhvWigglerHead)
+    if head ~= nil and head.oPosY > -10000 and head.oAction == WIGGLER_ACT_FALL_THROUGH_FLOOR and head.oTimer >= 60 then
+        remove_boss(CLASSIC_BOSSES[1])
+    end
+end)
 
 -- one effect per boss, so each can be tested with /chaos now <id> or switched off on its own
 for _, b in ipairs(CLASSIC_BOSSES) do
